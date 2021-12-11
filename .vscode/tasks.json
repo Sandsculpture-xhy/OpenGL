@@ -12,6 +12,8 @@
                 "-g",
                 "-m64",
                 "-Wall",
+                "${workspaceRoot}\\OpenGL lib\\libglfw3dll.a",
+                "${workspaceRoot}\\OpenGL lib\\libopengl32.a",
             ],
             "type": "shell",
             "group": {
