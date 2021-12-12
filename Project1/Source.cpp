@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <GL/gl.h>
 #include <glfw3.h>
+const char* PRONAME = "Project1";
 int main()
 {
     glfwInit();
