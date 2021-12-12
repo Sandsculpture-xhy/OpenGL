@@ -8,7 +8,7 @@
             "args": [
                 "${file}",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "${fileDirname}\\${relativeFileDirname}.exe",
                 "-g",
                 "-m64",
                 "-Wall",
