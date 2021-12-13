@@ -2,8 +2,20 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <time.h>
-const char *PRONAME = "Project1";
-const char *LOGNAME = "Project1.log";
+const char *PRONAME = "Project2";
+const char *LOGNAME = "Project2.log";
+const char *vertexShaderSource = "#version 330 core\n"
+                                 "layout (location = 0) in vec3 aPos;\n"
+                                 "void main()\n"
+                                 "{\n"
+                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                 "}\0";
+const char *fragmentShaderSource = "#version 330 core\n"
+                                   "out vec4 FragColor;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                   "}\0";
 struct tm *logtime;
 void REFRESHLOGTIME()
 {
@@ -49,6 +61,37 @@ int main()
     printf("[%s](%d:%d:%d): Initialize GLAD success\n", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec);
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //--------------------------------------
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f};
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        // std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"<< infoLog << std::endl;
+        REFRESHLOGTIME();
+        printf("[%s](%d:%d:%d): ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec, infoLog);
+        return 1;
+    }
+    printf("[%s](%d:%d:%d): Vertex Shader GLSL compile success\n", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec);
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    //--------------------------------------
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
