@@ -1,3 +1,6 @@
-[Project2](17:47:25): Create GLFW window success
-[Project2](17:47:25): Initialize GLAD success
-[Project2](17:47:27): User close the window
+[Project2](20:24:27): Create GLFW window success
+[Project2](20:24:27): Initialize GLAD success
+[Project2](20:24:27): Vertex Shader GLSL compile success
+[Project2](20:24:27): Fragment Shader GLSL compile success
+[Project2](20:24:27): Shader program link success
+[Project2](20:24:37): User close the window

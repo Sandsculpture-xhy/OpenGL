@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <time.h>
+#include <string.h>
 const char *PRONAME = "Project2";
 const char *LOGNAME = "Project2.log";
 const char *vertexShaderSource = "#version 330 core\n"
@@ -85,11 +86,49 @@ int main()
         printf("[%s](%d:%d:%d): ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec, infoLog);
         return 1;
     }
+    memset(infoLog, 0, sizeof(infoLog));
     printf("[%s](%d:%d:%d): Vertex Shader GLSL compile success\n", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec);
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        REFRESHLOGTIME();
+        printf("[%s](%d:%d:%d): ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec, infoLog);
+        return 1;
+    }
+    memset(infoLog, 0, sizeof(infoLog));
+    printf("[%s](%d:%d:%d): Fragment Shader GLSL compile success\n", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec);
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        REFRESHLOGTIME();
+        printf("[%s](%d:%d:%d): ERROR::PROGRAM::SHADER::LINK_FAILED\n%s", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec, infoLog);
+        return 1;
+    }
+    memset(infoLog, 0, sizeof(infoLog));
+    printf("[%s](%d:%d:%d): Shader program link success\n", PRONAME, logtime->tm_hour, logtime->tm_min, logtime->tm_sec);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    // 1. 绑定VAO
+    glBindVertexArray(VAO);
+    // 2. 把顶点数组复制到缓冲中供OpenGL使用
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // 3. 设置顶点属性指针
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
 
     //--------------------------------------
     while (!glfwWindowShouldClose(window))
@@ -98,6 +137,10 @@ int main()
 
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
